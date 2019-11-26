@@ -13,6 +13,13 @@ struct CurrentLocalWeather: Codable {
     let wind: Wind
     let name: String
     let main: Main
+    
+    func summary() -> String {
+        if weather.count > 0 {
+            return weather[0].summary
+        }
+        return ""
+    }
 }
 
 struct Weather: Codable {
@@ -24,6 +31,7 @@ struct Weather: Codable {
     let id: Int
     let main: String
     let summary: String
+    
 }
 
 struct Wind: Codable {
@@ -37,6 +45,10 @@ struct Main: Codable {
     let humidity: Int
     let temp_min: Double
     let temp_max: Double
+    
+    func tempDescription() -> String {
+        return Int(temp).description + "°"
+    }
 }
 
 
@@ -49,7 +61,6 @@ class WeatherDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadWeather()
-
     }
     
     func getWeather(completion: @escaping (Result<CurrentLocalWeather,Error>)->()) -> Void {
@@ -74,8 +85,8 @@ class WeatherDetailViewController: UIViewController {
                 switch results {
                 case .success(let currentWeather):
                     self.city.text = "Brisbane"
-                    self.temp.text = currentWeather.main.temp.description
-                    self.summary.text = currentWeather.weather[0].summary
+                    self.temp.text = currentWeather.main.tempDescription()
+                    self.summary.text = currentWeather.summary()
                 case .failure(_):
                     // show some error
                     break;
