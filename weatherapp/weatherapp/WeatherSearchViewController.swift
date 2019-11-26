@@ -20,6 +20,15 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
     let searchController = UISearchController(searchResultsController: nil)
     
     var cities:[City] = []
+    var filteredCities: [City] = []
+    
+    var isSearchBarEmpty: Bool {
+      return searchController.searchBar.text?.isEmpty ?? true
+    }
+    
+    var isFiltering: Bool {
+      return searchController.isActive && !isSearchBarEmpty
+    }
 
     //var viewModel: WeatherSearchViewModel!
 
@@ -46,10 +55,11 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
     }
 
     func updateSearchResults(for searchController: UISearchController) {
-        // update search results
+        let searchBar = searchController.searchBar
+        filterContentForSearchText(searchBar.text!)
     }
     
-    func didTapLocation() {
+    func didSearchCity(id: Int) {
         // push VC/VM loaded with location
     }
     
@@ -58,15 +68,30 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if isFiltering {
+          return filteredCities.count
+        }
         return cities.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        let city = cities[indexPath.row]
+        let city: City
+        if isFiltering {
+            city = filteredCities[indexPath.row]
+        }
+        else {
+            city = cities[indexPath.row]
+        }
         cell.textLabel?.text = city.name
         cell.detailTextLabel?.text = city.country
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // Call the API with this id
+        print(cities[indexPath.row].id)
+        didSearchCity(id: cities[indexPath.row].id)
     }
     
     // TODO: put in view model
@@ -100,6 +125,14 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
                 print(error)
             }
         }
+    }
+    
+    func filterContentForSearchText(_ searchText: String) {
+      filteredCities = cities.filter { (city: City) -> Bool in
+        return city.name.lowercased().contains(searchText.lowercased())
+      }
+      
+      tableView.reloadData()
     }
 
 }
