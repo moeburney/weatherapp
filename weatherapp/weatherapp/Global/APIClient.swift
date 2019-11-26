@@ -11,7 +11,7 @@ import Foundation
 class APIClient {
     static let standard = APIClient()
 
-    func getWeather(for id: Int, completion: @escaping (Result<CurrentLocalWeather,Error>)->()) -> Void {
+    func getWeather(id: Int, completion: @escaping (Result<CurrentLocalWeather,Error>)->()) -> Void {
         // TODO: create constants and an url constructor to make this nicer/reusable
            let url = "https://api.openweathermap.org/data/2.5/weather?id=\(id)&units=metric&appid=95d190a434083879a6398aafd54d9e73"
 
@@ -19,7 +19,21 @@ class APIClient {
                do {
                    let weather = try JSONDecoder().decode(CurrentLocalWeather.self, from: data!)
                 print(weather)
-                print("")
+                completion(.success(weather))
+               } catch {
+                completion(.failure(error))
+               }
+           }.resume()
+    }
+    
+    func getWeather(zipCode: String, completion: @escaping (Result<CurrentLocalWeather,Error>)->()) -> Void {
+        // TODO: create constants and an url constructor to make this nicer/reusable
+           let url = "https://api.openweathermap.org/data/2.5/weather?zip=\(zipCode)&units=metric&appid=95d190a434083879a6398aafd54d9e73"
+
+           URLSession.shared.dataTask(with: URL(string: url)!) {(data, response, error) in
+               do {
+                   let weather = try JSONDecoder().decode(CurrentLocalWeather.self, from: data!)
+                print(weather)
                 completion(.success(weather))
                } catch {
                 completion(.failure(error))

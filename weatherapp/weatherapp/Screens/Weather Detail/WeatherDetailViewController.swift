@@ -8,48 +8,6 @@
 
 import UIKit
 
-struct CurrentLocalWeather: Codable {
-    let weather: [Weather]
-    let wind: Wind
-    let name: String
-    let main: Main
-    
-    func summary() -> String {
-        if weather.count > 0 {
-            return weather[0].summary
-        }
-        return ""
-    }
-}
-
-struct Weather: Codable {
-    enum CodingKeys: String, CodingKey {
-        case id
-        case main
-        case summary = "description"
-    }
-    let id: Int
-    let main: String
-    let summary: String
-}
-
-struct Wind: Codable {
-    let speed: Double
-    let deg: Int
-}
-
-struct Main: Codable {
-    let temp: Double
-    let pressure: Int
-    let humidity: Int
-    let temp_min: Double
-    let temp_max: Double
-    
-    func tempDescription() -> String {
-        return Int(temp).description + "°"
-    }
-}
-
 class WeatherDetailViewController: UIViewController {
     @IBOutlet weak var contentView: UIView!
     @IBOutlet weak var city: UILabel!
@@ -92,7 +50,7 @@ extension WeatherDetailViewController: WeatherDetailViewModelDelegate {
         case .loaded(let currentWeather):
             contentView.isHidden = false
             loadingIndicator.stopAnimating()
-            self.city.text = viewModel?.city
+            self.city.text = viewModel?.city ?? viewModel?.zipCode
             self.temp.text = currentWeather.main.tempDescription()
             self.summary.text = currentWeather.summary()
         case .error:

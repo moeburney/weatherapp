@@ -42,10 +42,30 @@ final class WeatherDetailViewModel {
     
     func loadWeather() {
         self.state = .loading
-
-        // TODO : self.id shouldn't be optional, use a guard
-        
-        APIClient.standard.getWeather(for: self.id ?? 0) { (results) in
+        if let id = self.id {
+            loadWeather(id: id)
+        }
+        else if let zipCode = self.zipCode {
+            loadWeather(zipCode: zipCode)
+        }
+    }
+    
+    func loadWeather(id: Int) {
+        APIClient.standard.getWeather(id: id) { (results) in
+            DispatchQueue.main.async {
+                switch results {
+                case .success(let currentWeather):
+                    self.state = .loaded(weather: currentWeather)
+                case .failure(_):
+                    // show some error
+                    break;
+                }
+            }
+        }
+    }
+    
+    func loadWeather(zipCode: String) {
+        APIClient.standard.getWeather(zipCode: zipCode) { (results) in
             DispatchQueue.main.async {
                 switch results {
                 case .success(let currentWeather):

@@ -13,7 +13,7 @@ fileprivate extension String {
     static let fieldAccessibilityLabel = "Search weather by location"
 }
 
-final class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate, UITableViewDataSource {
+final class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate, UITableViewDataSource, UISearchBarDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -50,6 +50,7 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
         searchController.searchBar.placeholder = String.inputPlaceholderText
         navigationItem.searchController = searchController
         definesPresentationContext = true
+        searchController.searchBar.delegate = self
         self.tableView.tableHeaderView = searchController.searchBar
     }
     
@@ -69,6 +70,13 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
         return city.name.lowercased().contains(searchText.lowercased())
       }
       tableView.reloadData()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        if let searchBarText = searchBar.text,
+        let _ = Int(searchBarText) {
+            viewModel?.didEnterSearch(zipCode: searchBarText)
+        }
     }
 }
 
@@ -91,8 +99,8 @@ extension WeatherSearchViewController: WeatherSearchViewModelDelegate {
         case .enteredZipCode(let zipCode):
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let vc = storyboard.instantiateViewController(withIdentifier: "weatherDetail") as! WeatherDetailViewController
-            //    vc.viewModel = WeatherDetailViewModel(with zipCode: zipCode)
-            navigationController?.pushViewController(vc, animated: true)
+            vc.viewModel = WeatherDetailViewModel(zipCode: zipCode)
+            self.show(vc, sender: nil)
         case .error:
             break;
         }
