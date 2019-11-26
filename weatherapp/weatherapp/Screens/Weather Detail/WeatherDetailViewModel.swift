@@ -21,6 +21,7 @@ enum WeatherDetailViewState {
 final class WeatherDetailViewModel {
     weak var delegate: WeatherDetailViewModelDelegate?
 
+    var city: String?
     var id:Int?
     var zipCode:String?
     
@@ -38,24 +39,9 @@ final class WeatherDetailViewModel {
         self.zipCode = zipCode
     }
     
-    func getWeather(for id: Int, completion: @escaping (Result<CurrentLocalWeather,Error>)->()) -> Void {
-           let url = "https://api.openweathermap.org/data/2.5/weather?id=\(id)&units=metric&appid=95d190a434083879a6398aafd54d9e73"
-
-           URLSession.shared.dataTask(with: URL(string: url)!) {(data, response, error) in
-               do {
-                   let weather = try JSONDecoder().decode(CurrentLocalWeather.self, from: data!)
-                print(weather)
-                print("")
-                completion(.success(weather))
-               } catch {
-                   print("Error")
-               }
-           }.resume()
-    }
-    
     func loadWeather() {
         // TODO : self.id shouldn't be optional, use a guard
-        getWeather(for: self.id ?? 0) { (results) in
+        APIClient.standard.getWeather(for: self.id ?? 0) { (results) in
             DispatchQueue.main.async {
                 switch results {
                 case .success(let currentWeather):
