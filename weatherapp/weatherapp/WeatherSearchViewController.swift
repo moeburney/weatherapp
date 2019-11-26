@@ -18,16 +18,19 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
     @IBOutlet weak var tableView: UITableView!
     
     let searchController = UISearchController(searchResultsController: nil)
+    
+    var cities:[City] = []
 
     //var viewModel: WeatherSearchViewModel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupSearch()
-
+        setupSearchBar()
+        setupTableView()
+        loadCities()
     }
     
-    func setupSearch() {
+    func setupSearchBar() {
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = String.inputPlaceholderText
@@ -36,7 +39,7 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
         self.tableView.tableHeaderView = searchController.searchBar
     }
     
-    func setupTable() {
+    func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
     }
@@ -50,12 +53,43 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        return cities.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         return UITableViewCell()
     }
     
+    // TODO: put in view model
+    func loadCities() {
+        getCities { (results) in
+            DispatchQueue.main.async {
+                switch results {
+                case .success(let cities):
+                    self.cities = cities
+                case .failure(_):
+                    // show some error
+                    break;
+                }
+            }
+        }
+    }
+    
+    // TODO: put in data controller
+    func getCities(completion: @escaping (Result<[City],Error>)->()) -> Void {
+        if let path = Bundle.main.path(forResource: "city.list", ofType: "json") {
+            do {
+                let data = try Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
+                let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                let json = try JSONSerialization.data(withJSONObject: jsonResponse) 
+                let decoder = JSONDecoder()
+                let results = try decoder.decode([City].self, from: json)
+                completion(.success(results))
+            } catch {
+                // handle error
+                print(error)
+            }
+        }
+    }
 
 }
