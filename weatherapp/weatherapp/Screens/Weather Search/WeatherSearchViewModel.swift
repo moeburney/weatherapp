@@ -29,21 +29,25 @@ final class WeatherSearchViewModel {
         }
     }
     
+    // Load the cities json file from the local store
     func loadCities() {
-        APIClient.standard.getCities { (results) in
+        self.state = .loading
+        APIClient.standard.getCities { [weak self] (results) in
             switch results {
             case .success(let cities):
-                self.state = .loaded(cities: cities)
+                self?.state = .loaded(cities: cities)
             case .failure(_):
-                self.state = .error
+                self?.state = .error
             }
         }
     }
     
+    // User selected a city in the local cities json file
     func didEnterSearch(city:String, id: Int) {
         state = .enteredCity(city: city, id: id)
     }
     
+    // User manually entered a zip code
     func didEnterSearch(zipCode: String) {
         state = .enteredZipCode(zipCode: zipCode)
     }

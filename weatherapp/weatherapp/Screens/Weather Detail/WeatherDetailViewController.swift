@@ -8,15 +8,14 @@
 
 import UIKit
 
-class WeatherDetailViewController: UIViewController {
+// Shows current weather info for a particular open weather ID (city) or zip code
+final class WeatherDetailViewController: UIViewController {
     @IBOutlet weak var contentView: UIView!
     @IBOutlet weak var city: UILabel!
     @IBOutlet weak var temp: UILabel!
     @IBOutlet weak var summary: UILabel!
     
     var id:Int?
-    
-    let alert = UIAlertController(title: nil, message: "Please wait...", preferredStyle: .alert)
     let loadingIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
     
     var viewModel: WeatherDetailViewModel? {
@@ -44,15 +43,21 @@ extension WeatherDetailViewController: WeatherDetailViewModelDelegate {
     func weatherDetailViewStateDidUpdate(
         _ viewState: WeatherDetailViewState) {
         switch viewState {
+        // loading weather info from network, show a spinner
         case .loading:
-            contentView.isHidden = true
-            loadingIndicator.startAnimating()
+            DispatchQueue.main.async { [weak self] in
+                self?.contentView.isHidden = true
+                self?.loadingIndicator.startAnimating()
+            }
+        // weather info has been loaded
         case .loaded(let currentWeather):
-            contentView.isHidden = false
-            loadingIndicator.stopAnimating()
-            self.city.text = viewModel?.city ?? viewModel?.zipCode
-            self.temp.text = currentWeather.main.tempDescription()
-            self.summary.text = currentWeather.summary()
+            DispatchQueue.main.async { [weak self] in
+                self?.contentView.isHidden = false
+                self?.loadingIndicator.stopAnimating()
+                self?.city.text = self?.viewModel?.city ?? self?.viewModel?.zipCode
+                self?.temp.text = currentWeather.main.tempDescription()
+                self?.summary.text = currentWeather.summary()
+            }
         case .error:
             break;
         }

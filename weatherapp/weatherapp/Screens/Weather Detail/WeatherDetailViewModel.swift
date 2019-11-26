@@ -40,6 +40,7 @@ final class WeatherDetailViewModel {
         self.zipCode = zipCode
     }
     
+    // If open weather ID is available, call API with that, otherwise call by zip codes
     func loadWeather() {
         self.state = .loading
         if let id = self.id {
@@ -50,29 +51,29 @@ final class WeatherDetailViewModel {
         }
     }
     
+    // Call API to get local weather by ID representing a city
     func loadWeather(id: Int) {
-        APIClient.standard.getWeather(id: id) { (results) in
+        APIClient.standard.getWeather(id: id) { [weak self] (results) in
             DispatchQueue.main.async {
                 switch results {
                 case .success(let currentWeather):
-                    self.state = .loaded(weather: currentWeather)
+                    self?.state = .loaded(weather: currentWeather)
                 case .failure(_):
-                    // show some error
-                    break;
+                    self?.state = .error
                 }
             }
         }
     }
     
+    // Call API to get local weather by zip code
     func loadWeather(zipCode: String) {
-        APIClient.standard.getWeather(zipCode: zipCode) { (results) in
+        APIClient.standard.getWeather(zipCode: zipCode) { [weak self] (results) in
             DispatchQueue.main.async {
                 switch results {
                 case .success(let currentWeather):
-                    self.state = .loaded(weather: currentWeather)
+                    self?.state = .loaded(weather: currentWeather)
                 case .failure(_):
-                    // show some error
-                    break;
+                    self?.state = .error
                 }
             }
         }

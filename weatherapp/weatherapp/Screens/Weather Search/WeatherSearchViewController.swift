@@ -13,11 +13,15 @@ fileprivate extension String {
     static let fieldAccessibilityLabel = "Search weather by location"
 }
 
+// The entry point of the app, where user can search city or zip code to get current weather ingo
 final class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate, UITableViewDataSource, UISearchBarDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
     let searchController = UISearchController(searchResultsController: nil)
+    
+    // TODO: this is used in in another class, make it a separate VC to be reusable
+    let loadingIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
 
     var cities:[City] = []
     var filteredCities: [City] = []
@@ -40,6 +44,7 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
         super.viewDidLoad()
         setupSearchBar()
         setupTableView()
+        setupLoadingIndicator()
         viewModel = WeatherSearchViewModel()
         viewModel?.loadCities()
     }
@@ -60,6 +65,14 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
         tableView.dataSource = self
     }
     
+    func setupLoadingIndicator() {
+        self.view.addSubview(loadingIndicator)
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
     func updateSearchResults(for searchController: UISearchController) {
         let searchBar = searchController.searchBar
         filterContentForSearchText(searchBar.text!)
@@ -72,6 +85,11 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
       tableView.reloadData()
     }
     
+    // If user presses "search" instead of tapping on a city in the tableview,
+    // check if the search is numerical. If it is, try to search by zip code.
+    // Otherwise, do nothing.
+    // TODO: the UX of this approach requires some discussion, since doing nothing
+    // could confuse the user.
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         if let searchBarText = searchBar.text,
         let _ = Int(searchBarText) {
@@ -84,23 +102,33 @@ extension WeatherSearchViewController: WeatherSearchViewModelDelegate {
     func weatherSearchViewStateDidUpdate(
         _ viewState: WeatherSearchViewState) {
         switch viewState {
+        // The json file is loading, show spinner
         case .loading:
-            break;
-        case .loaded(let cities):
-            DispatchQueue.main.async {
-                self.cities = cities
-                self.tableView.reloadData()
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.isHidden = true
+                self?.loadingIndicator.startAnimating()
             }
+        // The json file is loaded, reload table of cities
+        case .loaded(let cities):
+            DispatchQueue.main.async { [weak self] in
+                self?.loadingIndicator.stopAnimating()
+                self?.tableView.isHidden = false
+                self?.cities = cities
+                self?.tableView.reloadData()
+            }
+        // User has tapped a city from the list, go to next screen and call API
         case .enteredCity(let city, let id):
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let vc = storyboard.instantiateViewController(withIdentifier: "weatherDetail") as! WeatherDetailViewController
             vc.viewModel = WeatherDetailViewModel(city: city, id: id)
             self.show(vc, sender: nil)
+        // User has manually entered a zip code with keyboard, go to next screen and call API
         case .enteredZipCode(let zipCode):
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let vc = storyboard.instantiateViewController(withIdentifier: "weatherDetail") as! WeatherDetailViewController
             vc.viewModel = WeatherDetailViewModel(zipCode: zipCode)
             self.show(vc, sender: nil)
+        // TODO: show an error
         case .error:
             break;
         }
@@ -122,6 +150,7 @@ extension WeatherSearchViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         let city: City
+        // If there has been some search kehboard input, filter the cities based on that
         if isFiltering {
             city = filteredCities[indexPath.row]
         }
