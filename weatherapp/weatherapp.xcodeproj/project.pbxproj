@@ -9,11 +9,11 @@
 /* Begin PBXBuildFile section */
 		099F8039238CB13800BB5CBF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099F8038238CB13800BB5CBF /* AppDelegate.swift */; };
 		099F803B238CB13800BB5CBF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099F803A238CB13800BB5CBF /* SceneDelegate.swift */; };
-		099F803D238CB13800BB5CBF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099F803C238CB13800BB5CBF /* ViewController.swift */; };
 		099F8040238CB13800BB5CBF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 099F803E238CB13800BB5CBF /* Main.storyboard */; };
 		099F8042238CB13900BB5CBF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 099F8041238CB13900BB5CBF /* Assets.xcassets */; };
 		099F8045238CB13900BB5CBF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 099F8043238CB13900BB5CBF /* LaunchScreen.storyboard */; };
 		099F8050238CB13900BB5CBF /* weatherappTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099F804F238CB13900BB5CBF /* weatherappTests.swift */; };
+		099F805B238CB52000BB5CBF /* WeatherViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099F805A238CB52000BB5CBF /* WeatherViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +30,6 @@
 		099F8035238CB13800BB5CBF /* weatherapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = weatherapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		099F8038238CB13800BB5CBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		099F803A238CB13800BB5CBF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		099F803C238CB13800BB5CBF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		099F803F238CB13800BB5CBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		099F8041238CB13900BB5CBF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		099F8044238CB13900BB5CBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -38,6 +37,7 @@
 		099F804B238CB13900BB5CBF /* weatherappTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = weatherappTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		099F804F238CB13900BB5CBF /* weatherappTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = weatherappTests.swift; sourceTree = "<group>"; };
 		099F8051238CB13900BB5CBF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		099F805A238CB52000BB5CBF /* WeatherViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,9 +79,9 @@
 		099F8037238CB13800BB5CBF /* weatherapp */ = {
 			isa = PBXGroup;
 			children = (
+				099F805A238CB52000BB5CBF /* WeatherViewController.swift */,
 				099F8038238CB13800BB5CBF /* AppDelegate.swift */,
 				099F803A238CB13800BB5CBF /* SceneDelegate.swift */,
-				099F803C238CB13800BB5CBF /* ViewController.swift */,
 				099F803E238CB13800BB5CBF /* Main.storyboard */,
 				099F8041238CB13900BB5CBF /* Assets.xcassets */,
 				099F8043238CB13900BB5CBF /* LaunchScreen.storyboard */,
@@ -200,8 +200,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				099F803D238CB13800BB5CBF /* ViewController.swift in Sources */,
 				099F8039238CB13800BB5CBF /* AppDelegate.swift in Sources */,
+				099F805B238CB52000BB5CBF /* WeatherViewController.swift in Sources */,
 				099F803B238CB13800BB5CBF /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
