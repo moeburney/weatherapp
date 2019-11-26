@@ -51,7 +51,6 @@ struct Main: Codable {
     }
 }
 
-
 class WeatherDetailViewController: UIViewController {
     @IBOutlet weak var city: UILabel!
     @IBOutlet weak var temp: UILabel!

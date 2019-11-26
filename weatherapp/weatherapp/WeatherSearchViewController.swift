@@ -13,7 +13,13 @@ fileprivate extension String {
     static let fieldAccessibilityLabel = "Search weather by location"
 }
 
-class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate, UITableViewDelegate, UITableViewDataSource {
+final class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate, UITableViewDataSource {
+    
+    var viewModel: WeatherSearchViewModel? {
+        didSet {
+            viewModel?.delegate = self
+        }
+    }
 
     @IBOutlet weak var tableView: UITableView!
     
@@ -36,7 +42,7 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
         super.viewDidLoad()
         setupSearchBar()
         setupTableView()
-        loadCities()
+        viewModel?.loadCities()
     }
     
     func setupSearchBar() {
@@ -58,21 +64,44 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
         let searchBar = searchController.searchBar
         filterContentForSearchText(searchBar.text!)
     }
-    
-    func didSearchCity(id: Int) {
-        self.performSegue(withIdentifier: "weatherDetail", sender: nil)
 
-        // push VC/VM loaded with location
+    func filterContentForSearchText(_ searchText: String) {
+      filteredCities = cities.filter { (city: City) -> Bool in
+        return city.name.lowercased().contains(searchText.lowercased())
+      }
+      tableView.reloadData()
     }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        //guard let index = self.tableView.indexPathForSelectedRow else { return }
-        //let city = cities[index.row]
-        //let eventDetailViewModel = EventDetailViewModel(event: event)
-        //guard let destVC = segue.destination as? WeatherDetailViewController else { return }
-        //destVC.viewModel = eventDetailViewModel
+}
+
+extension WeatherSearchViewController: WeatherSearchViewModelDelegate {
+    func weatherSearchViewStateDidUpdate(
+        _ viewState: WeatherSearchViewState) {
+        switch viewState {
+        case .loading: // load spinner
+            break;
+        case .loaded(let cities):
+            DispatchQueue.main.async {
+                self.cities = cities
+                self.tableView.reloadData()
+            }
+        case .enteredCity(let id):
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "WeatherDetail") as! WeatherDetailViewController
+            //    vc.viewModel = WeatherDetailViewModel(with id: id)
+            navigationController?.pushViewController(vc,
+                                                     animated: true)
+        case .enteredZipCode(let zipCode):
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "WeatherDetail") as! WeatherDetailViewController
+            //    vc.viewModel = WeatherDetailViewModel(with zipCode: zipCode)
+            navigationController?.pushViewController(vc, animated: true)
+        case .error:
+            break;
+        }
     }
-    
+}
+
+extension WeatherSearchViewController: UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -99,50 +128,6 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // Call the API with this id
-        print(cities[indexPath.row].id)
-        didSearchCity(id: cities[indexPath.row].id)
+        viewModel?.didEnterSearch(for: cities[indexPath.row].id)
     }
-    
-    // TODO: put in view model
-    func loadCities() {
-        getCities { (results) in
-            DispatchQueue.main.async {
-                switch results {
-                case .success(let cities):
-                    self.cities = cities
-                    self.tableView.reloadData()
-                case .failure(_):
-                    // show some error
-                    break;
-                }
-            }
-        }
-    }
-    
-    // TODO: put in data controller
-    func getCities(completion: @escaping (Result<[City],Error>)->()) -> Void {
-        if let path = Bundle.main.path(forResource: "city.list", ofType: "json") {
-            do {
-                let data = try Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
-                let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                let json = try JSONSerialization.data(withJSONObject: jsonResponse) 
-                let decoder = JSONDecoder()
-                let results = try decoder.decode([City].self, from: json)
-                completion(.success(results))
-            } catch {
-                // handle error
-                print(error)
-            }
-        }
-    }
-    
-    func filterContentForSearchText(_ searchText: String) {
-      filteredCities = cities.filter { (city: City) -> Bool in
-        return city.name.lowercased().contains(searchText.lowercased())
-      }
-      
-      tableView.reloadData()
-    }
-
 }
