@@ -13,31 +13,48 @@ fileprivate extension String {
     static let fieldAccessibilityLabel = "Search weather by location"
 }
 
-class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate {
+class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate, UITableViewDelegate, UITableViewDataSource {
 
-    @IBOutlet weak var contentView: UIView!
+    @IBOutlet weak var tableView: UITableView!
+    
     let searchController = UISearchController(searchResultsController: nil)
 
-   // var viewModel: WeatherViewModel!
+    //var viewModel: WeatherSearchViewModel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        setupSearch()
+
+    }
+    
+    func setupSearch() {
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = String.inputPlaceholderText
         navigationItem.searchController = searchController
         definesPresentationContext = true
-        
-        contentView.addSubview(searchController.searchBar)
+        self.tableView.tableHeaderView = searchController.searchBar
     }
     
-//    func didPresentSearchController(_ searchController: UISearchController) {
-//        searchController.searchBar.becomeFirstResponder()
-//    }
+    func setupTable() {
+        tableView.delegate = self
+        tableView.dataSource = self
+    }
 
     func updateSearchResults(for searchController: UISearchController) {
-        // do something
+        // update search results
+    }
+    
+    func didTapLocation() {
+        // push VC/VM loaded with location
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        return UITableViewCell()
     }
     
 

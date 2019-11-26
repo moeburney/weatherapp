@@ -1,5 +1,5 @@
 //
-//  WeatherViewModel.swift
+//  WeatherSearchViewModel.swift
 //  weatherapp
 //
 //  Created by Burney, Moe (AU - Sydney) on 26/11/19.
