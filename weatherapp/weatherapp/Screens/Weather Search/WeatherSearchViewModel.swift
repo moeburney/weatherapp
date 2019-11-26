@@ -15,7 +15,7 @@ protocol WeatherSearchViewModelDelegate: WeatherSearchViewController {
 enum WeatherSearchViewState {
     case loading
     case loaded(cities: [City])
-    case enteredCity(id: Int)
+    case enteredCity(city:String, id: Int)
     case enteredZipCode(zipCode: String)
     case error
 }
@@ -40,11 +40,11 @@ final class WeatherSearchViewModel {
         }
     }
     
-    func didEnterSearch(for id: Int) {
-        state = .enteredCity(id: id)
+    func didEnterSearch(city:String, id: Int) {
+        state = .enteredCity(city: city, id: id)
     }
     
-    func didEnterSearch(for zipCode: String) {
+    func didEnterSearch(zipCode: String) {
         state = .enteredZipCode(zipCode: zipCode)
     }
 }

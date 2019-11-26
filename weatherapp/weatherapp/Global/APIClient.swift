@@ -12,6 +12,7 @@ class APIClient {
     static let standard = APIClient()
 
     func getWeather(for id: Int, completion: @escaping (Result<CurrentLocalWeather,Error>)->()) -> Void {
+        // TODO: create constants and an url constructor to make this nicer/reusable
            let url = "https://api.openweathermap.org/data/2.5/weather?id=\(id)&units=metric&appid=95d190a434083879a6398aafd54d9e73"
 
            URLSession.shared.dataTask(with: URL(string: url)!) {(data, response, error) in
@@ -25,7 +26,6 @@ class APIClient {
                }
            }.resume()
     }
-    
     
     func getCities(completion: @escaping (Result<[City],Error>)->()) -> Void {
         if let path = Bundle.main.path(forResource: "city.list", ofType: "json") {

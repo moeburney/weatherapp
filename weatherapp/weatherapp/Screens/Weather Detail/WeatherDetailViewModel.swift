@@ -31,7 +31,8 @@ final class WeatherDetailViewModel {
         }
     }
 
-    init(id:Int) {
+    init(city: String, id:Int) {
+        self.city = city
         self.id = id
     }
     
@@ -40,7 +41,10 @@ final class WeatherDetailViewModel {
     }
     
     func loadWeather() {
+        self.state = .loading
+
         // TODO : self.id shouldn't be optional, use a guard
+        
         APIClient.standard.getWeather(for: self.id ?? 0) { (results) in
             DispatchQueue.main.async {
                 switch results {

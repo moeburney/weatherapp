@@ -18,6 +18,7 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
     @IBOutlet weak var tableView: UITableView!
     
     let searchController = UISearchController(searchResultsController: nil)
+
     var cities:[City] = []
     var filteredCities: [City] = []
     
@@ -37,9 +38,9 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewModel = WeatherSearchViewModel()
         setupSearchBar()
         setupTableView()
+        viewModel = WeatherSearchViewModel()
         viewModel?.loadCities()
     }
     
@@ -57,7 +58,7 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
         tableView.delegate = self
         tableView.dataSource = self
     }
-
+    
     func updateSearchResults(for searchController: UISearchController) {
         let searchBar = searchController.searchBar
         filterContentForSearchText(searchBar.text!)
@@ -75,17 +76,17 @@ extension WeatherSearchViewController: WeatherSearchViewModelDelegate {
     func weatherSearchViewStateDidUpdate(
         _ viewState: WeatherSearchViewState) {
         switch viewState {
-        case .loading: // load spinner
+        case .loading:
             break;
         case .loaded(let cities):
             DispatchQueue.main.async {
                 self.cities = cities
                 self.tableView.reloadData()
             }
-        case .enteredCity(let id):
+        case .enteredCity(let city, let id):
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let vc = storyboard.instantiateViewController(withIdentifier: "weatherDetail") as! WeatherDetailViewController
-            vc.viewModel = WeatherDetailViewModel(id: id)
+            vc.viewModel = WeatherDetailViewModel(city: city, id: id)
             self.show(vc, sender: nil)
         case .enteredZipCode(let zipCode):
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -125,6 +126,6 @@ extension WeatherSearchViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel?.didEnterSearch(for: cities[indexPath.row].id)
+        viewModel?.didEnterSearch(city: cities[indexPath.row].name, id: cities[indexPath.row].id)
     }
 }

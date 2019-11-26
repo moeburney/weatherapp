@@ -105,6 +105,7 @@
                     <navigationItem key="navigationItem" id="T3R-vd-C9A"/>
                     <connections>
                         <outlet property="city" destination="PrZ-Gy-jDh" id="nMI-QW-Go0"/>
+                        <outlet property="contentView" destination="Bsk-CI-ln9" id="MoO-Gd-d1Z"/>
                         <outlet property="summary" destination="oAA-F7-2wa" id="wD9-Ba-aGY"/>
                         <outlet property="temp" destination="6G9-ww-6u0" id="dbf-Oh-Ofg"/>
                     </connections>

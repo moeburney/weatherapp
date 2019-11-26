@@ -31,7 +31,6 @@ struct Weather: Codable {
     let id: Int
     let main: String
     let summary: String
-    
 }
 
 struct Wind: Codable {
@@ -52,10 +51,15 @@ struct Main: Codable {
 }
 
 class WeatherDetailViewController: UIViewController {
+    @IBOutlet weak var contentView: UIView!
     @IBOutlet weak var city: UILabel!
     @IBOutlet weak var temp: UILabel!
     @IBOutlet weak var summary: UILabel!
+    
     var id:Int?
+    
+    let alert = UIAlertController(title: nil, message: "Please wait...", preferredStyle: .alert)
+    let loadingIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
     
     var viewModel: WeatherDetailViewModel? {
         didSet {
@@ -65,7 +69,16 @@ class WeatherDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupLoadingIndicator()
         viewModel?.loadWeather()
+    }
+    
+    func setupLoadingIndicator() {
+        self.view.addSubview(loadingIndicator)
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
     }
 }
 
@@ -74,9 +87,12 @@ extension WeatherDetailViewController: WeatherDetailViewModelDelegate {
         _ viewState: WeatherDetailViewState) {
         switch viewState {
         case .loading:
-            break;
+            contentView.isHidden = true
+            loadingIndicator.startAnimating()
         case .loaded(let currentWeather):
-            self.city.text = "Brisbane"
+            contentView.isHidden = false
+            loadingIndicator.stopAnimating()
+            self.city.text = viewModel?.city
             self.temp.text = currentWeather.main.tempDescription()
             self.summary.text = currentWeather.summary()
         case .error:
