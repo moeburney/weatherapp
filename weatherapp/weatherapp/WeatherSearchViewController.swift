@@ -40,6 +40,7 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
     }
     
     func setupTableView() {
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.delegate = self
         tableView.dataSource = self
     }
@@ -52,12 +53,20 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
         // push VC/VM loaded with location
     }
     
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return cities.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return UITableViewCell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        let city = cities[indexPath.row]
+        cell.textLabel?.text = city.name
+        cell.detailTextLabel?.text = city.country
+        return cell
     }
     
     // TODO: put in view model
@@ -67,6 +76,7 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
                 switch results {
                 case .success(let cities):
                     self.cities = cities
+                    self.tableView.reloadData()
                 case .failure(_):
                     // show some error
                     break;
