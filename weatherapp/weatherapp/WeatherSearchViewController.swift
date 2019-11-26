@@ -15,18 +15,17 @@ fileprivate extension String {
 
 final class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate, UITableViewDataSource {
     
+    @IBOutlet weak var tableView: UITableView!
+    
+    let searchController = UISearchController(searchResultsController: nil)
+    var cities:[City] = []
+    var filteredCities: [City] = []
+    
     var viewModel: WeatherSearchViewModel? {
         didSet {
             viewModel?.delegate = self
         }
     }
-
-    @IBOutlet weak var tableView: UITableView!
-    
-    let searchController = UISearchController(searchResultsController: nil)
-    
-    var cities:[City] = []
-    var filteredCities: [City] = []
     
     var isSearchBarEmpty: Bool {
       return searchController.searchBar.text?.isEmpty ?? true
@@ -36,10 +35,9 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
       return searchController.isActive && !isSearchBarEmpty
     }
 
-    //var viewModel: WeatherSearchViewModel!
-
     override func viewDidLoad() {
         super.viewDidLoad()
+        viewModel = WeatherSearchViewModel()
         setupSearchBar()
         setupTableView()
         viewModel?.loadCities()
@@ -86,13 +84,12 @@ extension WeatherSearchViewController: WeatherSearchViewModelDelegate {
             }
         case .enteredCity(let id):
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: "WeatherDetail") as! WeatherDetailViewController
-            //    vc.viewModel = WeatherDetailViewModel(with id: id)
-            navigationController?.pushViewController(vc,
-                                                     animated: true)
+            let vc = storyboard.instantiateViewController(withIdentifier: "weatherDetail") as! WeatherDetailViewController
+            vc.viewModel = WeatherDetailViewModel(id: id)
+            self.show(vc, sender: nil)
         case .enteredZipCode(let zipCode):
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: "WeatherDetail") as! WeatherDetailViewController
+            let vc = storyboard.instantiateViewController(withIdentifier: "weatherDetail") as! WeatherDetailViewController
             //    vc.viewModel = WeatherDetailViewModel(with zipCode: zipCode)
             navigationController?.pushViewController(vc, animated: true)
         case .error:

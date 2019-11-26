@@ -52,7 +52,7 @@
         <!--Weather Detail View Controller-->
         <scene sceneID="fTy-55-Hjf">
             <objects>
-                <viewController storyboardIdentifier="weatherDetail" id="aMl-4v-OQv" customClass="WeatherDetailViewController" customModule="weatherapp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="weatherDetail" useStoryboardIdentifierAsRestorationIdentifier="YES" id="aMl-4v-OQv" customClass="WeatherDetailViewController" customModule="weatherapp" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="VDk-h1-W2E">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

@@ -57,41 +57,30 @@ class WeatherDetailViewController: UIViewController {
     @IBOutlet weak var summary: UILabel!
     var id:Int?
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        loadWeather()
-    }
-    
-    func getWeather(completion: @escaping (Result<CurrentLocalWeather,Error>)->()) -> Void {
-           let url = "https://api.openweathermap.org/data/2.5/weather?id=2172797&units=metric&appid=95d190a434083879a6398aafd54d9e73"
-           let objurl = URL(string: url)
-
-           URLSession.shared.dataTask(with: objurl!) {(data, response, error) in
-               do {
-                   let weather = try JSONDecoder().decode(CurrentLocalWeather.self, from: data!)
-                print(weather)
-                print("")
-                completion(.success(weather))
-               } catch {
-                   print("Error")
-               }
-           }.resume()
-    }
-    
-    func loadWeather() {
-        getWeather { (results) in
-            DispatchQueue.main.async {
-                switch results {
-                case .success(let currentWeather):
-                    self.city.text = "Brisbane"
-                    self.temp.text = currentWeather.main.tempDescription()
-                    self.summary.text = currentWeather.summary()
-                case .failure(_):
-                    // show some error
-                    break;
-                }
-            }
+    var viewModel: WeatherDetailViewModel? {
+        didSet {
+            viewModel?.delegate = self
         }
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        viewModel?.loadWeather()
+    }
+}
+
+extension WeatherDetailViewController: WeatherDetailViewModelDelegate {
+    func weatherDetailViewStateDidUpdate(
+        _ viewState: WeatherDetailViewState) {
+        switch viewState {
+        case .loading:
+            break;
+        case .loaded(let currentWeather):
+            self.city.text = "Brisbane"
+            self.temp.text = currentWeather.main.tempDescription()
+            self.summary.text = currentWeather.summary()
+        case .error:
+            break;
+        }
+    }
 }
