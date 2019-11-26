@@ -60,7 +60,17 @@ class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UI
     }
     
     func didSearchCity(id: Int) {
+        self.performSegue(withIdentifier: "weatherDetail", sender: nil)
+
         // push VC/VM loaded with location
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        //guard let index = self.tableView.indexPathForSelectedRow else { return }
+        //let city = cities[index.row]
+        //let eventDetailViewModel = EventDetailViewModel(event: event)
+        //guard let destVC = segue.destination as? WeatherDetailViewController else { return }
+        //destVC.viewModel = eventDetailViewModel
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
