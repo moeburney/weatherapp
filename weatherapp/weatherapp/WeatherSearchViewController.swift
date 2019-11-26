@@ -1,5 +1,5 @@
 //
-//  WeatherViewController.swift
+//  WeatherSearchViewController.swift
 //  weatherapp
 //
 //  Created by Burney, Moe (AU - Sydney) on 26/11/19.
@@ -8,10 +8,14 @@
 
 import UIKit
 
-class WeatherViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate {
+fileprivate extension String {
+    static let inputPlaceholderText = "Enter city or zip code"
+    static let fieldAccessibilityLabel = "Search weather by location"
+}
+
+class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate {
 
     @IBOutlet weak var contentView: UIView!
-    var searchText:String?
     let searchController = UISearchController(searchResultsController: nil)
 
    // var viewModel: WeatherViewModel!
@@ -21,7 +25,7 @@ class WeatherViewController: UIViewController, UISearchResultsUpdating, UISearch
         
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search Cities"
+        searchController.searchBar.placeholder = String.inputPlaceholderText
         navigationItem.searchController = searchController
         definesPresentationContext = true
         
