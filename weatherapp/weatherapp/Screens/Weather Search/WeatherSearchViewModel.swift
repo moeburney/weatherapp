@@ -29,7 +29,11 @@ enum WeatherSearchViewState {
 }
 
 final class WeatherSearchViewModel {
-    weak var delegate: WeatherSearchViewModelDelegate?
+    weak var delegate: WeatherSearchViewModelDelegate? {
+        didSet {
+            delegate?.weatherSearchViewStateDidUpdate(state)
+        }
+    }
 
     private var state: WeatherSearchViewState = .loading {
         didSet {

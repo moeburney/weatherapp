@@ -19,7 +19,7 @@
                                 <rect key="frame" x="0.0" y="44" width="414" height="818"/>
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="rtd-vd-MLW">
-                                        <rect key="frame" x="8" y="8" width="398" height="802"/>
+                                        <rect key="frame" x="8" y="8" width="398" height="552"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                     </tableView>
                                 </subviews>
@@ -27,7 +27,7 @@
                                 <constraints>
                                     <constraint firstItem="rtd-vd-MLW" firstAttribute="leading" secondItem="064-IQ-u6D" secondAttribute="leadingMargin" id="50P-dr-HVq"/>
                                     <constraint firstAttribute="trailingMargin" secondItem="rtd-vd-MLW" secondAttribute="trailing" id="H1H-Lh-kND"/>
-                                    <constraint firstAttribute="bottomMargin" secondItem="rtd-vd-MLW" secondAttribute="bottom" id="igB-mt-WMm"/>
+                                    <constraint firstAttribute="bottomMargin" secondItem="rtd-vd-MLW" secondAttribute="bottom" constant="250" id="igB-mt-WMm"/>
                                     <constraint firstItem="rtd-vd-MLW" firstAttribute="top" secondItem="064-IQ-u6D" secondAttribute="topMargin" id="qhe-6M-FiA"/>
                                 </constraints>
                             </view>
@@ -105,7 +105,7 @@
                     <navigationItem key="navigationItem" id="T3R-vd-C9A"/>
                     <connections>
                         <outlet property="city" destination="PrZ-Gy-jDh" id="nMI-QW-Go0"/>
-                        <outlet property="contentView" destination="Bsk-CI-ln9" id="MoO-Gd-d1Z"/>
+                        <outlet property="contentView" destination="Bsk-CI-ln9" id="Eaf-Fm-Y23"/>
                         <outlet property="summary" destination="oAA-F7-2wa" id="wD9-Ba-aGY"/>
                         <outlet property="temp" destination="6G9-ww-6u0" id="dbf-Oh-Ofg"/>
                     </connections>
