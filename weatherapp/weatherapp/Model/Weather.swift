@@ -46,6 +46,6 @@ struct Main: Codable {
     let temp_max: Double
     
     func tempDescription() -> String {
-        return Int(temp).description + "°"
+        return Int(round(temp)).description + "°"
     }
 }

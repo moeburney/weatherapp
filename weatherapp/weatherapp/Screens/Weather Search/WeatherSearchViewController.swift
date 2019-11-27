@@ -7,14 +7,16 @@
 //
 
 import UIKit
+import CoreLocation
 
 fileprivate extension String {
     static let inputPlaceholderText = "Enter city or zip code"
     static let fieldAccessibilityLabel = "Search weather by location"
 }
 
-// The entry point of the app, where user can search city or zip code to get current weather ingo
-final class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate, UITableViewDataSource, UISearchBarDelegate {
+// The entry point of the app,
+// where user can search city, current location, or zip code to get current weather info
+final class WeatherSearchViewController: UIViewController, UISearchResultsUpdating, UISearchControllerDelegate, UITableViewDataSource, UISearchBarDelegate, CLLocationManagerDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -25,6 +27,8 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
 
     var cities:[City] = []
     var filteredCities: [City] = []
+    let locationManager = CLLocationManager()
+
     
     var viewModel: WeatherSearchViewModel? {
         didSet {
@@ -45,6 +49,7 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
         setupSearchBar()
         setupTableView()
         setupLoadingIndicator()
+        setupLocationManager()
         viewModel = WeatherSearchViewModel()
         viewModel?.loadCities()
     }
@@ -73,6 +78,25 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
         loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
     }
     
+    func setupLocationManager() {
+        // Ask for Authorisation from the User.
+        self.locationManager.requestAlwaysAuthorization()
+
+        // For use in foreground
+        self.locationManager.requestWhenInUseAuthorization()
+
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.startUpdatingLocation()
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let locValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
+        print("locations = \(locValue.latitude) \(locValue.longitude)")
+    }
+    
     func updateSearchResults(for searchController: UISearchController) {
         let searchBar = searchController.searchBar
         filterContentForSearchText(searchBar.text!)
@@ -99,6 +123,8 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
 }
 
 extension WeatherSearchViewController: WeatherSearchViewModelDelegate {
+
+    
     func weatherSearchViewStateDidUpdate(
         _ viewState: WeatherSearchViewState) {
         switch viewState {

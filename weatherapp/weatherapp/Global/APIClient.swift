@@ -41,6 +41,21 @@ class APIClient {
            }.resume()
     }
     
+    func getWeather(lon: Double, lat: Double, completion: @escaping (Result<CurrentLocalWeather,Error>)->()) -> Void {
+        // TODO: create constants file and a url constructor to make this more modular
+           let url = "https://api.openweathermap.org/data/2.5/weather?lon=\(lon)&lat=\(lat)&units=metric&appid=95d190a434083879a6398aafd54d9e73"
+
+           URLSession.shared.dataTask(with: URL(string: url)!) {(data, response, error) in
+               do {
+                   let weather = try JSONDecoder().decode(CurrentLocalWeather.self, from: data!)
+                print(weather)
+                completion(.success(weather))
+               } catch {
+                completion(.failure(error))
+               }
+           }.resume()
+    }
+    
     func getCities(completion: @escaping (Result<[City],Error>)->()) -> Void {
         if let path = Bundle.main.path(forResource: "city.list", ofType: "json") {
             do {
