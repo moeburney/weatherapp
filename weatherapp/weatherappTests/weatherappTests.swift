@@ -65,7 +65,8 @@ class WeatherDetailViewModelTest: XCTestCase, WeatherDetailViewModelDelegate {
     private var state: WeatherDetailViewState!
     private var delegateCalled: Bool = false
     
-    func testViewModelCallsDelegateAfterLoadCities() {
+    // TODO: currently tests the real openweather API; should create a mock class instead
+    func testViewModelCallsDelegateAfterLoadWeather() {
         weatherExpectation = expectation(description: "Weather")
 
         let vm = WeatherDetailViewModel(city: "Hurzuf", id: 707860)
@@ -76,6 +77,7 @@ class WeatherDetailViewModelTest: XCTestCase, WeatherDetailViewModelDelegate {
         XCTAssertTrue(delegateCalled)
     }
     
+    // TODO: currently tests the real openweather API; should create a mock class instead
     func testViewModelLoadsWeather() {
         weatherExpectation = expectation(description: "Weather")
 

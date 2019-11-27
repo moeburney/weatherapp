@@ -70,7 +70,6 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
         tableView.dataSource = self
         //tableView.tableHeaderView = searchController.searchBar
         navigationItem.searchController = searchController
-
     }
     
     func setupLoadingIndicator() {
