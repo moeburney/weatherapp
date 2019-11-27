@@ -186,7 +186,7 @@ extension WeatherSearchViewController: UITableViewDelegate {
         // If there has been some search keyboard input, use the filtered list
         if isFiltering {
             viewModel?.didEnterSearch(city: filteredCities[indexPath.row].name,
-                                      id: cities[indexPath.row].id)
+                                      id: filteredCities[indexPath.row].id)
         }
         else {
             viewModel?.didEnterSearch(city: cities[indexPath.row].name,
