@@ -18,15 +18,7 @@ enum WeatherSearchViewState {
     case enteredCity(city:String, id: Int)
     case enteredZipCode(zipCode: String)
     case error
-    
-    // for testing if model was loaded
-    func isLoaded() -> Bool {
-        if case .loaded = self {
-            return true
-        }
-        return false
-    }
-    
+
     // for testing if data was loaded
     func getCities() -> [City]? {
         if case .loaded(let cities) = self {

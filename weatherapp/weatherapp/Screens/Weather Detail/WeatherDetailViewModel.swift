@@ -17,14 +17,6 @@ enum WeatherDetailViewState {
     case loaded(weather: CurrentLocalWeather)
     case error
     
-    // for testing if model was loaded
-    func isLoaded() -> Bool {
-        if case .loaded = self {
-            return true
-        }
-        return false
-    }
-    
     // for testing if data was loaded
     func getWeather() -> CurrentLocalWeather? {
         if case .loaded(let weather) = self {

@@ -10,9 +10,9 @@ import XCTest
 @testable import weatherapp
 
 class WeatherSearchViewModelTest: XCTestCase, WeatherSearchViewModelDelegate {
-    weak private var citiesExpectation: XCTestExpectation?
+    private var citiesExpectation: XCTestExpectation!
     private var state: WeatherSearchViewState!
-    var delegateCalled = false
+    private var delegateCalled: Bool = false
     
     func testViewModelCallsDelegateAfterLoadCities() {
         citiesExpectation = expectation(description: "Cities")
@@ -21,8 +21,8 @@ class WeatherSearchViewModelTest: XCTestCase, WeatherSearchViewModelDelegate {
         vm.delegate = self
         vm.loadCities()
         
-        waitForExpectations(timeout: 100.0, handler: nil)
-        XCTAssertTrue(state.isLoaded())
+        waitForExpectations(timeout: 100.0)
+        XCTAssertTrue(delegateCalled)
     }
     
     func testViewModelLoadsCities() {
@@ -32,50 +32,53 @@ class WeatherSearchViewModelTest: XCTestCase, WeatherSearchViewModelDelegate {
         vm.delegate = self
         vm.loadCities()
         
-        waitForExpectations(timeout: 100.0, handler: nil)
+        waitForExpectations(timeout: 100.0)
         XCTAssertNotNil(state.getCities())
+        XCTAssertGreaterThan(state.getCities()!.count, 0)
     }
     
     func weatherSearchViewStateDidUpdate(_ viewState: WeatherSearchViewState) {
-        delegateCalled = true
         state = viewState
-        citiesExpectation?.fulfill()
-        citiesExpectation = nil
+        if case .loaded = state {
+            delegateCalled = true
+            citiesExpectation.fulfill()
+        }
     }
 }
 
 class WeatherDetailViewModelTest: XCTestCase, WeatherDetailViewModelDelegate {
-    weak private var weatherExpectation: XCTestExpectation?
+    private var weatherExpectation: XCTestExpectation!
     private var state: WeatherDetailViewState!
-    var delegateCalled = false
+    private var delegateCalled: Bool = false
     
     func testViewModelCallsDelegateAfterLoadCities() {
         weatherExpectation = expectation(description: "Weather")
 
-        let vm = WeatherDetailViewModel(city: "Sydney", id: 1)
+        let vm = WeatherDetailViewModel(city: "Hurzuf", id: 707860)
         vm.delegate = self
         vm.loadWeather()
         
-        waitForExpectations(timeout: 100.0, handler: nil)
-        XCTAssertTrue(state.isLoaded())
+        waitForExpectations(timeout: 100.0)
+        XCTAssertTrue(delegateCalled)
     }
     
     func testViewModelLoadsWeather() {
         weatherExpectation = expectation(description: "Weather")
 
-        let vm = WeatherDetailViewModel(city: "Sydney", id: 1)
+        let vm = WeatherDetailViewModel(city: "Hurzuf", id: 707860)
         vm.delegate = self
         vm.loadWeather()
         
-        waitForExpectations(timeout: 100.0, handler: nil)
+        waitForExpectations(timeout: 100.0)
         XCTAssertNotNil(state.getWeather())
     }
     
     func weatherDetailViewStateDidUpdate(_ viewState: WeatherDetailViewState) {
-        delegateCalled = true
         state = viewState
-        weatherExpectation?.fulfill()
-        weatherExpectation = nil
+        if case .loaded = state {
+            delegateCalled = true
+            weatherExpectation.fulfill()
+        }
     }
 }
 
