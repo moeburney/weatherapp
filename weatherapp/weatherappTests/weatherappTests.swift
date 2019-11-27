@@ -7,12 +7,26 @@
 //
 
 import XCTest
+import CoreLocation
 @testable import weatherapp
 
 class WeatherSearchViewModelTest: XCTestCase, WeatherSearchViewModelDelegate {
     private var citiesExpectation: XCTestExpectation!
     private var state: WeatherSearchViewState!
     private var delegateCalled: Bool = false
+    
+    func testGetNearestCityTo() {
+        let vm = WeatherSearchViewModel()
+        let coords = CLLocationCoordinate2D(latitude: 44.549999, longitude: 34.283333)
+        let city = vm.getNearestCityTo(userLocation: coords,
+                            cities: [City(id: 100,
+                            name: "Hurzuf",
+                            country: "UA",
+                            coord: Coord(
+                                lat: 44.549999,
+                                lon: 34.283333))])
+        XCTAssertEqual(city?.id, 100)
+    }
     
     func testViewModelCallsDelegateAfterLoadCities() {
         citiesExpectation = expectation(description: "Cities")
