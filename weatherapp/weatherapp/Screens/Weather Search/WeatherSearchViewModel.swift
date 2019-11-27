@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 protocol WeatherSearchViewModelDelegate: class {
     func weatherSearchViewStateDidUpdate(_ viewState: WeatherSearchViewState)
@@ -15,6 +16,7 @@ protocol WeatherSearchViewModelDelegate: class {
 enum WeatherSearchViewState {
     case loading
     case loaded(cities: [City])
+    case gpsLoaded
     case enteredCity(city:String, id: Int)
     case enteredZipCode(zipCode: String)
     case error
@@ -54,6 +56,10 @@ final class WeatherSearchViewModel {
         }
     }
     
+    func didLoadGPS() {
+        state = .gpsLoaded
+    }
+    
     // User selected a city in the local cities json file
     func didEnterSearch(city:String, id: Int) {
         state = .enteredCity(city: city, id: id)
@@ -62,5 +68,22 @@ final class WeatherSearchViewModel {
     // User manually entered a zip code
     func didEnterSearch(zipCode: String) {
         state = .enteredZipCode(zipCode: zipCode)
+    }
+    
+    func getNearestCityTo(userLocation: CLLocationCoordinate2D, cities: [City]) -> City? {
+        let userCoordinates = CLLocation(latitude: userLocation.latitude, longitude: userLocation.longitude)
+        let cityLocations = cities.map { $0.location }
+        let closestCity = cityLocations.min(by:
+        { $0.distance(from: userCoordinates) < $1.distance(from: userCoordinates) })
+        
+        let city = cities.filter {
+                $0.location.coordinate.latitude == closestCity!.coordinate.latitude &&
+                $0.location.coordinate.longitude == closestCity!.coordinate.longitude }.first
+        
+        guard let userCity = city else { return nil }
+        return City(id: userCity.id,
+                    name: "My Location",
+                    country: userCity.country,
+                    coord: userCity.coord)
     }
 }

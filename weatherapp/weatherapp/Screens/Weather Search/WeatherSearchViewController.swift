@@ -12,7 +12,6 @@ import CoreLocation
 fileprivate extension String {
     static let inputPlaceholderText = "Enter city or zip code"
     static let inputPlaceholderTextWithGPS = "Enter city, zip code, or \"My Location\""
-
     static let fieldAccessibilityLabel = "Search weather by location"
 }
 
@@ -56,21 +55,22 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
     }
     
     func setupSearchBar() {
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.sizeToFit()
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = String.inputPlaceholderText
-        navigationItem.searchController = searchController
         definesPresentationContext = true
         searchController.searchBar.delegate = self
-
-        //self.tableView.tableHeaderView = searchController.searchBar
     }
     
     func setupTableView() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.tableHeaderView = searchController.searchBar
+        //tableView.tableHeaderView = searchController.searchBar
+        navigationItem.searchController = searchController
+
     }
     
     func setupLoadingIndicator() {
@@ -102,52 +102,11 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
     // check if the search is numerical. If it is, try to search by zip code.
     // Otherwise, do nothing.
     // TODO: the UX of this approach requires some discussion, since doing nothing
-    // could confuse the user.
+    // could confuse the user. Require some error handling / alerts.
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         if let searchBarText = searchBar.text,
         let _ = Int(searchBarText) {
             viewModel?.didEnterSearch(zipCode: searchBarText)
-        }
-    }
-    
-    func didPresentSearchController(_ searchController: UISearchController) {
-        searchController.searchBar.becomeFirstResponder()
-    }
-}
-
-extension WeatherSearchViewController: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let userLoc: CLLocationCoordinate2D = manager.location?.coordinate else { return }
-        let userCoordinates = CLLocation(latitude: userLoc.latitude, longitude: userLoc.longitude)
-        let cityLocations = self.cities.map { $0.location }
-        let closestCity = cityLocations.min(by:
-        { $0.distance(from: userCoordinates) < $1.distance(from: userCoordinates) })
-        let city = self.cities.filter {
-            $0.location.coordinate.latitude == closestCity!.coordinate.latitude &&
-                $0.location.coordinate.longitude == closestCity!.coordinate.longitude }.first
-        if city != nil {
-            let city1 = City(id: city!.id,
-                             name: "My Location",
-                             country: city!.country,
-                             coord: city!.coord)
-            // add a field to cities called "My Location" with city as the object
-            self.cities.append(city1)
-            DispatchQueue.main.async {
-                self.searchController.searchBar.placeholder = String.inputPlaceholderTextWithGPS
-                self.tableView.reloadData()
-            }
-        }
-    }
-
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-            print("Failed to find user's location: \(error.localizedDescription)")
-    }
-    
-    func requestLocation() {
-        if CLLocationManager.locationServicesEnabled() {
-            self.locationManager.delegate = self
-            self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-            self.locationManager.requestLocation()
         }
     }
 }
@@ -170,6 +129,12 @@ extension WeatherSearchViewController: WeatherSearchViewModelDelegate {
                 self?.cities = cities
                 self?.tableView.reloadData()
                 self?.requestLocation()
+            }
+        // GPS coords loaded for device, update table to include "My Location"
+        case .gpsLoaded:
+            DispatchQueue.main.async { [weak self] in
+                self?.searchController.searchBar.placeholder = String.inputPlaceholderTextWithGPS
+                self?.tableView.reloadData()
             }
         // User has tapped a city from the list, go to next screen and call API
         case .enteredCity(let city, let id):
@@ -206,7 +171,7 @@ extension WeatherSearchViewController: UITableViewDelegate {
         let cell = UITableViewCell(style: UITableViewCell.CellStyle.subtitle, reuseIdentifier: "Cell")
 
         let city: City
-        // If there has been some search kehboard input, filter the cities based on that
+        // If there has been some search keyboard input, filter the cities based on that
         if isFiltering {
             city = filteredCities[indexPath.row]
         }
@@ -219,6 +184,7 @@ extension WeatherSearchViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // If there has been some search keyboard input, use the filtered list
         if isFiltering {
             viewModel?.didEnterSearch(city: filteredCities[indexPath.row].name,
                                       id: cities[indexPath.row].id)
@@ -226,6 +192,28 @@ extension WeatherSearchViewController: UITableViewDelegate {
         else {
             viewModel?.didEnterSearch(city: cities[indexPath.row].name,
                                       id: cities[indexPath.row].id)
+        }
+    }
+}
+
+extension WeatherSearchViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        // add a field to cities called "My Location" with city as the object
+        guard let userLoc: CLLocationCoordinate2D = manager.location?.coordinate else { return }
+        guard let userCity = self.viewModel?.getNearestCityTo(userLocation: userLoc, cities: self.cities) else { return }
+        self.cities.append(userCity)
+        viewModel?.didLoadGPS()
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+            print("Failed to find user's location: \(error.localizedDescription)")
+    }
+    
+    func requestLocation() {
+        if CLLocationManager.locationServicesEnabled() {
+            self.locationManager.delegate = self
+            self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            self.locationManager.requestLocation()
         }
     }
 }
