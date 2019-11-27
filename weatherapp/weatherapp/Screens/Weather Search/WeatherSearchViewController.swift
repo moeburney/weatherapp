@@ -68,7 +68,6 @@ final class WeatherSearchViewController: UIViewController, UISearchResultsUpdati
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.delegate = self
         tableView.dataSource = self
-        //tableView.tableHeaderView = searchController.searchBar
         navigationItem.searchController = searchController
     }
     
